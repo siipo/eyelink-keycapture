@@ -75,4 +75,9 @@ Set `dummy_mode = true` in `config.ini`. The keys, screenshots and CSV work as n
 
 ## Building the .exe
 
-On a Windows x64 PC with Python 3.12 installed, run `build.bat`. It creates `dist\EyeLinkKeyCapture\`.
+**In the browser (no local Python needed):** GitHub Actions builds the program on GitHub's Windows machines.
+- Edit files directly on github.com: open a file and click the pencil icon.
+- For a test build, go to **Actions › Build › Run workflow**. When the run finishes, the program can be downloaded from the run page under *Artifacts*.
+- To publish a new version, go to **Releases › Draft a new release**, create a new tag such as `v1.1` and publish it. The workflow builds `EyeLinkKeyCapture.zip` and attaches it to the release.
+
+**Locally:** on a Windows x64 PC with Python 3.12 installed, run `build.bat`. It creates `dist\EyeLinkKeyCapture\`.

@@ -1,0 +1,47 @@
+# Builds EyeLinkKeyCapture.zip on GitHub's Windows machines.
+# - Actions tab > Build > Run workflow: builds the zip, downloadable from the run page.
+# - Publishing a release (Releases > Draft a new release): builds and attaches the zip.
+name: Build
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"  # pylink has no wheels for newer Python yet
+
+      - name: Install packages
+        run: |
+          python -m pip install mss pynput pygame pyinstaller
+          python -m pip install --index-url=https://pypi.sr-research.com sr-research-pylink
+
+      - name: Build exe
+        run: pyinstaller --noconfirm --clean --onedir --console --name EyeLinkKeyCapture --collect-all pylink eyelink_keycapture.py
+
+      - name: Package
+        shell: pwsh
+        run: |
+          Copy-Item config.ini, README.md, QUICKSTART.txt dist\EyeLinkKeyCapture\
+          Compress-Archive -Path dist\EyeLinkKeyCapture -DestinationPath EyeLinkKeyCapture.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EyeLinkKeyCapture
+          path: dist/EyeLinkKeyCapture
+
+      - name: Attach to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload ${{ github.event.release.tag_name }} EyeLinkKeyCapture.zip --clobber
