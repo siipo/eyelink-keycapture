@@ -1,0 +1,46 @@
+EYELINK KEY CAPTURE - QUICK START
+==================================
+
+WHAT IT DOES
+Records EyeLink eye tracking while the participant reads images in a DICOM
+viewer (or any other program). When the participant presses a key to mark a
+finding, the program:
+  - writes a KEYPRESS message to the EDF file, and
+  - saves a full-resolution screenshot of the 4200x2800 screen.
+In Data Viewer you can then see where the participant was looking, drawn on
+the exact screen they saw, and check whether it matches the finding.
+
+INSTALL
+1. Unzip this folder to a SHORT path, e.g. C:\EyeLinkKeyCapture
+   (a long, deeply nested path stops the program from starting).
+2. Nothing else needs to be installed.
+3. Connect the Display PC to the EyeLink Host PC by Ethernet, as for WebLink.
+4. If the Host PC address is not 100.1.1.1, change host_ip in config.ini.
+
+RUN A SESSION
+1. Start the EyeLink Host software.
+2. Start EyeLinkKeyCapture.exe and type the participant ID.
+3. Calibrate on the 4200x2800 screen:
+     Enter = camera image, C = calibrate, V = validate, Esc = done.
+4. Bring the DICOM viewer to the front.
+5. Keys:
+     2         start the next case
+     1         participant marks a finding (screenshot + EDF message)
+     F9        recalibrate (then press 2 to continue)
+     F10 x2    stop, copy the EDF from the Host PC and exit
+   Keys can be changed in config.ini.
+
+RESULTS
+data\<ID>_<date>_<time>\
+    <ID>_<date>_<time>.edf   eye tracking data, one trial per case
+    images\                  screenshots (keep next to the EDF)
+    keypresses.csv           list of all case starts and keypresses
+    session.log              program log
+Open the EDF in Data Viewer. Each keypress screenshot becomes the background
+at the moment of that press.
+
+TEST WITHOUT THE TRACKER
+Set dummy_mode = true in config.ini. Keys and screenshots work as normal, but
+no gaze data or EDF file is recorded.
+
+More detail: README.md
