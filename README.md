@@ -23,7 +23,7 @@ Get `EyeLinkKeyCapture.zip` from the [Releases](https://github.com/siipo/eyelink
 
 1. Start the EyeLink Host software, then run `EyeLinkKeyCapture.exe`.
 2. Type the participant/session ID. Use letters, digits and `_`. The Host PC keeps only the first 8 characters, but the saved EDF keeps the full ID.
-3. **Calibrate:** the calibration screen opens on the 4200×2800 screen. Press Enter for the camera image, C to calibrate, V to validate, then Esc to finish. You can also drive this from the Host PC.
+3. **Calibrate:** the calibration screen opens on the 4200×2800 screen. Press Enter for the camera image, C to calibrate, V to validate, then Esc to finish. You can also drive this from the Host PC. To change how far the targets spread across the screen, set `calibration_area_horizontal` and `calibration_area_vertical` in `config.ini` (percent of screen width and height; EyeLink defaults 88 and 83).
 4. Bring the DICOM viewer to the front.
 5. Use these keys while the viewer has focus:
 
