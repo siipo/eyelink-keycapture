@@ -73,6 +73,18 @@ def parse_rgb(text):
     return tuple(parts)
 
 
+def get_percent(cfg, section, key, fallback):
+    """Read a percentage such as 88 or 88% and check it is above 0 and at most 100."""
+    raw = cfg.get(section, key, raw=True, fallback=str(fallback)).strip().rstrip("%").strip()
+    try:
+        value = float(raw)
+    except ValueError:
+        raise SystemExit(f"config.ini: {key} must be a percentage, got '{raw}'")
+    if not 0 < value <= 100:
+        raise SystemExit(f"config.ini: {key} must be above 0 and at most 100, got {value:g}")
+    return value
+
+
 def load_config():
     path = os.path.join(app_dir(), "config.ini")
     cfg = configparser.ConfigParser(inline_comment_prefixes=(";", "#"))
@@ -85,6 +97,8 @@ def load_config():
         "host_ip": cfg.get("tracker", "host_ip", fallback="100.1.1.1"),
         "dummy": cfg.getboolean("tracker", "dummy_mode", fallback=False),
         "cal_type": cfg.get("tracker", "calibration_type", fallback="HV9"),
+        "cal_area_h": get_percent(cfg, "tracker", "calibration_area_horizontal", 88),
+        "cal_area_v": get_percent(cfg, "tracker", "calibration_area_vertical", 83),
         "monitor": cfg.get("display", "monitor", fallback="auto").strip().lower(),
         "width": cfg.getint("display", "width", fallback=4200),
         "height": cfg.getint("display", "height", fallback=2800),
@@ -483,6 +497,12 @@ class Session:
         t.sendCommand(f"screen_pixel_coords = 0 0 {w - 1} {h - 1}")
         t.sendMessage(f"DISPLAY_COORDS 0 0 {w - 1} {h - 1}")
         t.sendCommand(f"calibration_type = {self.cfg['cal_type']}")
+        # Spread of the targets as a share of the screen, centred. Validation
+        # uses the same area so it checks the calibrated region.
+        area = f"{self.cfg['cal_area_h'] / 100:.3f} {self.cfg['cal_area_v'] / 100:.3f}"
+        t.sendCommand(f"calibration_area_proportion = {area}")
+        t.sendCommand(f"validation_area_proportion = {area}")
+        log(f"Calibration area: {self.cfg['cal_area_h']:g}% x {self.cfg['cal_area_v']:g}% of the screen")
         version = 0
         if not self.cfg["dummy"]:
             vstr = t.getTrackerVersionString()
